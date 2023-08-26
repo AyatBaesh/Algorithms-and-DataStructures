@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+    <form>
+        <label for ="search">Search for GIFs:</label>
+        <input id = "search" type ="search" required>
+    </form>
+  <img src="#"> 
+  <script>class Node{
+    constructor(data, left = null, right = null){
+       this.data = data;
+       this.left = left;
+       this.right = right;
+    }
+
+}
+
+class BST{
+    constructor(){
+        this.root = null;
+    }
+    isEmpty(){
+        return !this.root;
+    }
+    add(data){//[19,45,85,1,9,19,245,9]
+        const node = this.root;
+        if(!node){
+            this.root = new Node(data);
+            return;
+        }
+        const searchTree = (node) => {
+        if(data < node.data){
+            if(!node.left){
+                node.left = new Node(data);
+                return;
+            }else if(node.left){
+                return searchTree(node.left);
+            }
+        }else if(data > node.data){
+            if(!node.right){
+                node.right = new Node(data);
+                return;
+            }else if(node.right){
+                return searchTree(node.right);
+            }
+        }else{
+            return null;
+        }
+        return searchTree(node);
+    }
+    }
+    prettyPrint(node, prefix = "", isLeft = true){
+        node = this.root;
+        if (node === null) {
+          return;
+        }
+        if (node.right !== null) {
+          prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
+        }
+        console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
+        if (node.left !== null) {
+          prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
+        }
+      };
+}
+let BalancedTree = new BST();
+console.log('hello')
+let arr = [19,45,85,1,9,19,245,9];
+for(let i in arr){
+    BalancedTree.add(arr[i]);
+}
+console.log(BalancedTree.isEmpty());
+BalancedTree.prettyPrint();
+</script>
+
+</body>
+</html>

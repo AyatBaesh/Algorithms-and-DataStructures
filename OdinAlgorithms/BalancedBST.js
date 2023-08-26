@@ -43,21 +43,31 @@ class Tree{
         if(start > end){
             return null;
         }
-        // console.log('arr = ' + arr);
         let mid = Math.floor((start+end)/2);
         let node = new Node (arr[mid]);
-        if(!this.root){
-            this.root = node;
-        }
-        // console.log(`mid = ${mid} start  = ${start} end = ${end}`)
+        this.root = node;
         node.left = this.buildTree(arr, start, mid - 1);
-        // console.log(`left: ${node.left}`)
         node.right = this.buildTree(arr, mid + 1, end);
-        // console.log(`right: ${node.right} `)
-
-        // console.log(`node ${node} data: ${node.data} left ${node.left} right: ${node.right}`)
         return node;
         
+    }
+    rebalance(node = this.root){
+        let queue = [this.root];
+        let newArr = [];
+        while(queue.length){
+            let length = queue.length;
+            newArr.push(queue.map(node => node.data));
+            while(length--){
+                queue.shift();
+                if(node.left) queue.push(node.left);
+                if(node.right) queue.push(node.right);
+            }
+        }
+        this.buildTree(newArr);
+        return;
+        
+
+
     }
     min(){
         let current = this.root;
@@ -77,14 +87,17 @@ class Tree{
     }
     
     insert(data){
+        if(typeof(data) === 'array'){
+            data.forEach((dataEl) => {
+                return this.insert(dataEl);
+            })
+        }
         let node = this.root;
-        console.log(node)
         if(!node){
             this.root = new Node(data);
             return;
         }
         const searchData = (node) => {
-            // console.log(`data ${data} node data: ${node.data}`)
             if(data < node.data){
                 if(!node.left){
                     node.left = new Node(data);
@@ -104,7 +117,6 @@ class Tree{
                 return;
             }
         }
-        // console.log(searchData(node));
         return searchData(node);
 
     }
@@ -143,7 +155,9 @@ class Tree{
     }
     find(data){
         let current = this.root;
+        let count = 0;
         while(current.data !== data){
+            count++;
             if(data < current.data){
                 current = current.left;
             }else{
@@ -153,15 +167,106 @@ class Tree{
                 console.log("Data is not present");
                 return null;
             }
-
         }
-        console.log('data found at: ' + current.data);
+        console.table( current);
         return current;
     }
-    levelOrderT(){
-        let queue = [];
+    findDepth(data){
+        if(!data){
+            return null;
+        }
         let current = this.root;
-        while(current !== null){}
+        let count = 0;
+        while(current.data !== data){
+            count++;
+            if(data < current.data){
+                current = current.left;
+            }else{
+                current = current.right;
+            }
+            if(current === null){
+                console.log("Data is not present");
+                return null;
+            }
+        }
+        return count;
+    }
+    findHeight(node = this.root) {
+
+            if (node == null) {
+                return -1;
+            };
+            let left = this.findHeight(node.left);
+            let right = this.findHeight(node.right);
+            return left > right ? left + 1 : right + 1;
+    } 
+
+    isBalanced(node = this.root){
+        if(node == null) return true;
+        const heightDifference = Math.abs(this.findHeight(node.left) - this.findHeight(node.right));
+        return (heightDifference <= 1 && this.isBalanced(node.left) && this.isBalanced(node.right));
+    }
+    levelOrder(callback){
+
+        if(!this.root) return [];
+        let queue = [this.root];
+        let output = [];   
+
+        while(queue.length){
+            let length = queue.length;
+            output.push(queue.map(node => node.data));
+            while(length--){
+                let node = queue.shift();
+                if(node.left)  queue.push(node.left);
+                if(node.right) queue.push(node.right);
+                if (callback) callback(node);
+            }
+        }
+        console.log(output);
+        if(!callback) return output;
+    }
+    inOrder(callback){
+        if(!this.root) return [];
+        let result = [];
+        let iterate = (node = this.root) => {
+            if(!node) return;
+            iterate(node.left);
+            if(callback) callback(node);
+            result.push(node.data);
+            iterate(node.right);
+        }
+        iterate();
+        console.log(result);
+        if(!callback) return result;
+    }
+    preOrder(callback){
+        if(!this.root) return [];
+        let result = [];
+        let iterate = (node = this.root) => {
+            if(!node) return;
+            iterate(node.right);
+            if(callback) return callback(node);
+            result.push(node.data);
+            iterate(node.left);
+        }
+        iterate();
+        console.log(result)
+        return result;
+    }
+    postOrder(callback){
+        if(!this.root) return [];
+        let result = [];
+        let iterate = (node = this.root) => {
+            if(!node) return;
+            iterate(node.left);
+            iterate(node.right);
+            if(callback) return callback(node);
+            result.push(node.data);
+
+        }
+        iterate();
+        console.log(result)
+        return result;
     }
     prettyPrint(node = this.root, prefix = "", isLeft = true){
 
@@ -184,18 +289,23 @@ class Tree{
     
 
 
-let TestTree = new Tree([5,2,2,5,1,2,3,4,6]);
+let TestTree = new Tree([5,2,2,4,6,78,123,45]);
 TestTree.buildTree();
-TestTree.insert(10);
+TestTree.insert([10,25,60,28]);
 
-TestTree.find(5);
+console.log(TestTree.find(10));
 TestTree.max();
 TestTree.min();
-TestTree.delete(3);
+// TestTree.delete(3);
 
 TestTree.prettyPrint();
-
-
+// TestTree.levelOrder();
+// TestTree.inOrder();
+// TestTree.preOrder();
+// TestTree.postOrder();
+console.log(TestTree.findHeight(4));
+console.log(TestTree.findDepth(10));
+console.log(TestTree.isBalanced());
 
 
 

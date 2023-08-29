@@ -1,5 +1,5 @@
 class Node{
-    constructor(data, left, right){
+    constructor(data, left = null, right = null){
         this.data = data;
         this.left = left;
         this.right = right;
@@ -39,7 +39,7 @@ class Tree{
         return [...this.quickSort(leftArr), pivot, ...this.quickSort(rightArr)];
     }
 
-    buildTree(arr = this.sortedArr, start = 0, end = arr.length){
+    buildTree(arr = this.sortedArr, start = 0, end = arr.length - 1){
         if(start > end){
             return null;
         }
@@ -54,17 +54,20 @@ class Tree{
         
     }
     prettyPrint(node = this.root, prefix = "", isLeft = true){
+        console.table(node);
+
         if (node === null) {
-          return null;
+          return;
         }
         if (node.right !== null) {
+            console.log('right is not null it is ' + node.right)
           this.prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
         }
         console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
         if (node.left !== null) {
           this.prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
         }
-      };
+    }
 }
 
 let TestTree = new Tree([5,2,2,5,1,2,3,4,6]);

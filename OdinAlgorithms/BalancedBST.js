@@ -9,9 +9,8 @@ class Node{
 class Tree{
     constructor(arr){
         this.arr = arr;
-        this.root = null;
-        this.sortedArr = this.quickSort(this.removeDuplicates(arr));
-
+        let sortedArr = this.quickSort(this.removeDuplicates(arr));
+        this.root = this.buildTree(sortedArr);
     }
     removeDuplicates(arr){
         let uniqueArr = [];
@@ -23,6 +22,7 @@ class Tree{
         return uniqueArr;
     }
     quickSort(arr){
+
         if(arr.length <= 1){
             return arr;
         }
@@ -43,28 +43,18 @@ class Tree{
         if(start > end){
             return null;
         }
-        let mid = Math.floor((start+end)/2);
+        let mid = parseInt((start+end)/2);
         let node = new Node (arr[mid]);
-        this.root = node;
         node.left = this.buildTree(arr, start, mid - 1);
         node.right = this.buildTree(arr, mid + 1, end);
         return node;
         
     }
-    rebalance(node = this.root){
-        let queue = [this.root];
-        let newArr = [];
-        while(queue.length){
-            let length = queue.length;
-            newArr.push(queue.map(node => node.data));
-            while(length--){
-                queue.shift();
-                if(node.left) queue.push(node.left);
-                if(node.right) queue.push(node.right);
-            }
-        }
-        this.buildTree(newArr);
-        return;
+    rebalance(){
+        if(!this.root) return;
+   
+        let sorted = this.quickSort(this.removeDuplicates([...this.inOrder()]));
+        this.root = this.buildTree(sorted);
         
 
 
@@ -74,7 +64,6 @@ class Tree{
         while(current.left !== null){
             current = current.left;
         }
-        console.log('Min is ' + current.data);
         return current.data;
     }
     max(){
@@ -82,44 +71,16 @@ class Tree{
         while(current.right !== null){
             current = current.right;
         }
-        console.log('Max is ' + current.data);
         return current.data;
     }
-    
-    insert(data){
-        if(typeof(data) === 'array'){
-            data.forEach((dataEl) => {
-                return this.insert(dataEl);
-            })
-        }
-        let node = this.root;
-        if(!node){
-            this.root = new Node(data);
-            return;
-        }
-        const searchData = (node) => {
-            if(data < node.data){
-                if(!node.left){
-                    node.left = new Node(data);
-                    return;
-                }else if(node.left){
-                    return searchData(node.left);
-                }
+    insert(data, root = this.root) {
+        if (root === null) return new Node(data);
+        root.key < data
+          ? (root.right = this.insert(data, root.right))
+          : (root.left = this.insert(data, root.left));
+        return root;
+      }
 
-            }else if(data > node.data){
-                if(!node.right){
-                    node.right = new Node(data);
-                    return;
-                }else if(node.right){
-                    return searchData(node.right);
-                }
-            }else{
-                return;
-            }
-        }
-        return searchData(node);
-
-    }
     delete(data){
         const removeNode = (node, data) => {
             if(node === null){
@@ -164,11 +125,9 @@ class Tree{
                 current = current.right;
             }
             if(current === null){
-                console.log("Data is not present");
-                return null;
+                return "Data is not present";
             }
         }
-        console.table( current);
         return current;
     }
     findDepth(data){
@@ -185,8 +144,7 @@ class Tree{
                 current = current.right;
             }
             if(current === null){
-                console.log("Data is not present");
-                return null;
+                return "Data is not present";
             }
         }
         return count;
@@ -222,7 +180,6 @@ class Tree{
                 if (callback) callback(node);
             }
         }
-        console.log(output);
         if(!callback) return output;
     }
     inOrder(callback){
@@ -236,7 +193,6 @@ class Tree{
             iterate(node.right);
         }
         iterate();
-        console.log(result);
         if(!callback) return result;
     }
     preOrder(callback){
@@ -250,7 +206,6 @@ class Tree{
             iterate(node.left);
         }
         iterate();
-        console.log(result)
         return result;
     }
     postOrder(callback){
@@ -265,11 +220,9 @@ class Tree{
 
         }
         iterate();
-        console.log(result)
         return result;
     }
     prettyPrint(node = this.root, prefix = "", isLeft = true){
-
         if (node === null) {
           return;
         }
@@ -290,22 +243,30 @@ class Tree{
 
 
 let TestTree = new Tree([5,2,2,4,6,78,123,45]);
-TestTree.buildTree();
-TestTree.insert([10,25,60,28]);
-
-console.log(TestTree.find(10));
-TestTree.max();
-TestTree.min();
-// TestTree.delete(3);
-
+let newArr = [25,56,78,1,3,4,1];
 TestTree.prettyPrint();
-// TestTree.levelOrder();
-// TestTree.inOrder();
-// TestTree.preOrder();
-// TestTree.postOrder();
-console.log(TestTree.findHeight(4));
-console.log(TestTree.findDepth(10));
+console.log('inOrder ' + TestTree.inOrder() + '\n' +
+            'preOrder ' +  TestTree.preOrder() + '\n' +
+            'postOrder ' + TestTree.postOrder() + '\n');
+for(let i of newArr){
+    TestTree.insert(i);
+}
+
 console.log(TestTree.isBalanced());
+TestTree.rebalance();
+console.log(TestTree.isBalanced());
+TestTree.prettyPrint();
+console.log(TestTree.find(10));
+console.log('max is ' + TestTree.max());
+console.log('min is ' + TestTree.min());
+TestTree.delete(3);
+
+
+console.log('levelOrder ' + TestTree.levelOrder());
+
+console.log('height of 4 is ' + TestTree.findHeight(4));
+console.log('depth of 45 is ' + TestTree.findDepth(45));
+
 
 
 
